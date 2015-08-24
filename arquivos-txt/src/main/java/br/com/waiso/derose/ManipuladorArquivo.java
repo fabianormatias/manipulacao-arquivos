@@ -3,7 +3,6 @@ package br.com.waiso.derose;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -11,8 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
-
-import com.google.gson.stream.JsonWriter;
 
 public class ManipuladorArquivo {
 
@@ -22,13 +19,6 @@ public class ManipuladorArquivo {
 		return instance;
 	}
 
-	/**
-	 * Retorna uma String com as informações do arquivo
-	 * 
-	 * @param diretorio
-	 * @param arquivo
-	 * @throws IOException
-	 */
 	public String leitor(String path) throws IOException {
 		StringBuilder sb = new StringBuilder();
 		
@@ -45,13 +35,6 @@ public class ManipuladorArquivo {
 		return sb.toString();
 	}
 
-	/**
-	 * Pega a lista com os dados e salva no arquivo
-	 * 
-	 * @param path
-	 * @param chaves
-	 * @throws IOException
-	 */
 	public void escritor(String path, SortedSet<String> chaves) throws IOException {
 		BufferedWriter buffWrite = new BufferedWriter(new FileWriter(path));
 		for (String chave : chaves) {
@@ -60,12 +43,6 @@ public class ManipuladorArquivo {
 		buffWrite.close();
 	}
 	
-	/**
-	 * 
-	 * @param path
-	 * @param chaves
-	 * @throws IOException
-	 */
 	public void escritorJson(String path, Map<String, SortedSet<String>> agruparChaves) throws IOException {
 		int cont1 = 0;
 		int cont2 = 0;
@@ -83,9 +60,11 @@ public class ManipuladorArquivo {
 			SortedSet<String> chavesAgrupadas = chaves.getValue();
 			for (String chave : chavesAgrupadas) {
 				if (cont2 == 0) {
-					buffWrite.append(" \"" + chave.toString() + "\": ");
+//					buffWrite.append(" \"" + chave.toString() + "\": ");
+					buffWrite.append(" \"" + chave.toString() + "\" ");
 				} else {
-					buffWrite.append(" ,\"" + chave.toString() + "\": ");
+//					buffWrite.append(" ,\"" + chave.toString() + "\": ");
+					buffWrite.append(" ,\"" + chave.toString() + "\" ");
 				}
 				cont2++;
 			}
@@ -96,49 +75,58 @@ public class ManipuladorArquivo {
 		buffWrite.close();
 	}
 	
-	/**
-	 * 
-	 * @param path
-	 * @param chaves
-	 * @throws IOException
-	 */
-	public void escritorJson2(String path, Map<String, SortedSet<String>> agruparChaves) throws IOException {
-		JsonWriter jsonWrite = new JsonWriter(new FileWriter(path));
-		jsonWrite.beginObject();
-		for (Map.Entry<String, SortedSet<String>> chaves : agruparChaves.entrySet()) {
-//			jsonWrite.name(chaves.getKey());
-//			jsonWrite.
-			SortedSet<String> chavesAgrupadas = chaves.getValue();
-			for (String chave : chavesAgrupadas) {
-//				jsonWrite.value(chave);
+//	public void escritorJson2(String path, Map<String, SortedSet<String>> agruparChaves) throws IOException {
+//		JsonWriter jsonWrite = new JsonWriter(new FileWriter(path));
+////		jsonWrite.beginObject();
+//		Gson gson = new GsonBuilder().create();
+//		System.out.println(gson.toJson(agruparChaves));
+////		for (Map.Entry<String, SortedSet<String>> chaves : agruparChaves.entrySet()) {
+//////			jsonWrite.name(chaves.getKey());
+//////			jsonWrite.
+////			SortedSet<String> chavesAgrupadas = chaves.getValue();
+////			for (String chave : chavesAgrupadas) {
+//////				jsonWrite.value(chave);
+////			}
+////		}
+//		jsonWrite.close();
+//	}
+	
+	public List<String> buscaArquivosHtmlDiretorios(String pasta, String extensao, String... diretorios) {
+		List<String> arquivos = new ArrayList<String>();
+		
+		if (diretorios != null) {
+			for (String diretorio : diretorios) {
+				arquivos = buscaArquivosHtmlDiretorio(pasta, extensao, diretorio);
 			}
+		} else {
+			arquivos = buscaArquivosHtmlDiretorio(pasta, extensao, null);
 		}
-		jsonWrite.close();
+		return arquivos;
 	}
 	
-	/**
-	 * 
-	 * 
-	 * @param diretorio
-	 * @return
-	 */
-	public List<String> buscaArquivosHtmlDiretorio(String diretorio) {
+	public List<String> buscaArquivosHtmlDiretorio(String pasta, String extensao, String diretorio) {
 		List<String> arquivos = new ArrayList<String>();
-
-		FileFilter filter = new FileFilter() {
-			public boolean accept(File file) {
-				return file.getName().endsWith(".html");
-			}
-		};
-
-		File dir = new File(diretorio);
-		File[] files = dir.listFiles(filter);
-		for (File file : files) {
-			if (file.exists()) {
-				arquivos.add(file.getName());
+		
+		File dir1 = new File(pasta);
+		File[] files1 = dir1.listFiles();
+		for (File file1 : files1) {
+			if (file1.isDirectory() && diretorio != null) {
+				if (diretorio.equals(file1.getName())) {
+					File dir2 = new File(file1.getPath());
+					File[] files2 = dir2.listFiles();
+					for (File file2 : files2) {
+						if (file2.getName().endsWith(extensao)) {
+							arquivos.add(file2.getPath());
+						}
+					}
+				}
+			} else {
+				if (file1.getName().endsWith(extensao)) {
+					arquivos.add(file1.getPath());
+				}
 			}
 		}
 		return arquivos;
 	}
-
+	
 }

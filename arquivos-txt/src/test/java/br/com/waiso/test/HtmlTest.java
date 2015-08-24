@@ -9,51 +9,46 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import br.com.waiso.derose.ManipuladorArquivo;
 
 public class HtmlTest {
 
-	private StringBuilder padrao;
-	private StringBuilder padraoChaves;
-	private String diretorioWeb;
-	private String diretorioPhone;
+	private String diretorio;
 	private String arquivo;
-	private List<String> arquivosWeb;
-	private List<String> arquivosPhone;
+	private List<String> arquivos;
 	private SortedSet<String> chaves;
 	private Pattern pattern;
 	private Matcher matcher;
 	
 	private String DESTINO_CHAVES = "//Users/fabianorodriguesmatias/Developer/testes/testes/derose.txt";
-	private String DESTINO_TMX = "//Users/fabianorodriguesmatias/Developer/testes/testes/derose-chaves.txt";
-
+	private String DESTINO_TMX = "//Users/fabianorodriguesmatias/Developer/testes/testes/derose-i18n.json";
+	
+	// Explicando a expressão regular:  
+    // data-i18n - serve para bater com o "data-i18n"  
+    // ()  - serve para agrupar o que desejo achar para poder usar group(1)  
+    // .   - bate com qualquer caracter  
+    // *?  - Serve para repetir a expressão anterior (no caso ".") 0 a infinitas vezes,   
+    //       mas usando o o método "não-ganancioso" (ou seja, bate com a expressão mais curta, não a mais longa possível).
+	private String PADRAO = "data-i18n(.*?)<";
+	
+	private String PADRAO_CHAVES = "\"(.*?)<";
+	
 	@Test
 	public void testCapturaChaves() {
 		try {
-			pattern = Pattern.compile(padrao.toString(), Pattern.CASE_INSENSITIVE);
+			pattern = Pattern.compile(PADRAO, Pattern.CASE_INSENSITIVE);
 			
-			diretorioWeb = "//Users/fabianorodriguesmatias/Developer/testes/alterada";
-			diretorioPhone = "//Users/fabianorodriguesmatias/Developer/testes/alterada/phone";
+			diretorio = "//Users/fabianorodriguesmatias/Developer/testes/alterada";
 
 			// Busca dos arquivos existentes no diretório
-			arquivosWeb = ManipuladorArquivo.getInstance().buscaArquivosHtmlDiretorio(diretorioWeb);
-			arquivosPhone = ManipuladorArquivo.getInstance().buscaArquivosHtmlDiretorio(diretorioPhone);
+			arquivos = ManipuladorArquivo.getInstance().buscaArquivosHtmlDiretorio(diretorio, ".html", "phone");
 			
 			chaves = new TreeSet<String>();
 			// Chave arquivo web
-			for (String arquivoWeb : arquivosWeb) {
-				arquivo = ManipuladorArquivo.getInstance().leitor(diretorioWeb + "/" +  arquivoWeb);
-				matcher = pattern.matcher(arquivo);
-				while (matcher.find()) {
-					chaves.add(matcher.group());
-				}
-			}
-			// Chave arquivo web
-			for (String arquivoPhone : arquivosPhone) {
-				arquivo = ManipuladorArquivo.getInstance().leitor(diretorioPhone + "/" + arquivoPhone);
+			for (String arq : arquivos) {
+				arquivo = ManipuladorArquivo.getInstance().leitor(arq);
 				matcher = pattern.matcher(arquivo);
 				while (matcher.find()) {
 					chaves.add(matcher.group());
@@ -68,7 +63,7 @@ public class HtmlTest {
 	@Test
 	public void testAjustaChaves() {
 		try {
-			pattern = Pattern.compile(padraoChaves.toString(), Pattern.CASE_INSENSITIVE);
+			pattern = Pattern.compile(PADRAO_CHAVES, Pattern.CASE_INSENSITIVE);
 			chaves = new TreeSet<String>();
 			
 			//Map que irá receber os objetos agrupados
@@ -77,8 +72,11 @@ public class HtmlTest {
 			arquivo = ManipuladorArquivo.getInstance().leitor(DESTINO_CHAVES);
 			matcher = pattern.matcher(arquivo);
 			while (matcher.find()) {
-//				chaves.add(matcher.group().replace("\"", " ") + "=");
-				chaves.add(matcher.group().replace("\"", " "));
+				String match = matcher.group();
+				match = match.replace("\"", "");
+				match = match.replace(">", "\":\"");
+				match = match.replace("<", "");
+				chaves.add(match);
 			}
 			
 			for (String chave : chaves) {
@@ -93,73 +91,10 @@ public class HtmlTest {
 				agruparChaves.get(chaveDividida[0]).add(chaveDividida[1]);
 			}
 			
-			ManipuladorArquivo.getInstance().escritorJson2(DESTINO_TMX, agruparChaves);
+			ManipuladorArquivo.getInstance().escritorJson(DESTINO_TMX, agruparChaves);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-
-	@Before
-	public void padrao() {
-		padrao = new StringBuilder();
-		padrao.append("data-i18n=\"");
-		padrao.append("(");
-		padrao.append("[a-zA-Z_0-9]*");
-		padrao.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padrao.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padrao.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padrao.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padrao.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padrao.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padrao.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padrao.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padrao.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padrao.append(")");
-		padrao.append("\\.");
-		padrao.append("(");
-		padrao.append("[a-zA-Z_0-9]*");
-		padrao.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padrao.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padrao.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padrao.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padrao.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padrao.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padrao.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padrao.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padrao.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padrao.append(")");
-		padrao.append("\"");
-	}
 	
-	@Before
-	public void padraoChaves() {
-		padraoChaves = new StringBuilder();
-		padraoChaves.append("[^\"]");
-		padraoChaves.append("(");
-		padraoChaves.append("[a-zA-Z_0-9]*");
-		padraoChaves.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padraoChaves.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padraoChaves.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padraoChaves.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padraoChaves.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padraoChaves.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padraoChaves.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padraoChaves.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padraoChaves.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padraoChaves.append(")");
-		padraoChaves.append("\\.");
-		padraoChaves.append("(");
-		padraoChaves.append("[a-zA-Z_0-9]*");
-		padraoChaves.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padraoChaves.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padraoChaves.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padraoChaves.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padraoChaves.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padraoChaves.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padraoChaves.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padraoChaves.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padraoChaves.append("|[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*\\-[a-zA-Z_0-9]*");
-		padraoChaves.append(")");
-		padraoChaves.append("\"");
-	}
 }
