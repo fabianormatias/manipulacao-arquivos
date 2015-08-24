@@ -11,6 +11,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+
 public class ManipuladorArquivo {
 
 	private static ManipuladorArquivo instance = new ManipuladorArquivo();
@@ -75,21 +79,22 @@ public class ManipuladorArquivo {
 		buffWrite.close();
 	}
 	
-//	public void escritorJson2(String path, Map<String, SortedSet<String>> agruparChaves) throws IOException {
+	public void escritorJson2(String path, Map<String, JsonObject> agruparChaves) throws IOException {
 //		JsonWriter jsonWrite = new JsonWriter(new FileWriter(path));
-////		jsonWrite.beginObject();
-//		Gson gson = new GsonBuilder().create();
-//		System.out.println(gson.toJson(agruparChaves));
-////		for (Map.Entry<String, SortedSet<String>> chaves : agruparChaves.entrySet()) {
-//////			jsonWrite.name(chaves.getKey());
-//////			jsonWrite.
-////			SortedSet<String> chavesAgrupadas = chaves.getValue();
-////			for (String chave : chavesAgrupadas) {
-//////				jsonWrite.value(chave);
-////			}
-////		}
+//		jsonWrite.beginObject();
+		Gson gson = new GsonBuilder().create();
+//		gson.toJson(agruparChaves);
+		System.out.println(gson.toJson(agruparChaves));
+//		for (Map.Entry<String, SortedSet<String>> chaves : agruparChaves.entrySet()) {
+////			jsonWrite.name(chaves.getKey());
+////			jsonWrite.
+//			SortedSet<String> chavesAgrupadas = chaves.getValue();
+//			for (String chave : chavesAgrupadas) {
+////				jsonWrite.value(chave);
+//			}
+//		}
 //		jsonWrite.close();
-//	}
+	}
 	
 	public List<String> buscaArquivosHtmlDiretorios(String pasta, String extensao, String... diretorios) {
 		List<String> arquivos = new ArrayList<String>();
