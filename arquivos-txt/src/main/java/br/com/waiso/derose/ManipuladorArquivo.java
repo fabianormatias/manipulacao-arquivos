@@ -9,7 +9,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedSet;
+
+import com.google.gson.stream.JsonWriter;
 
 public class ManipuladorArquivo {
 
@@ -26,13 +29,10 @@ public class ManipuladorArquivo {
 	 * @param arquivo
 	 * @throws IOException
 	 */
-	public String leitor(String diretorio, String arquivo) throws IOException {
+	public String leitor(String path) throws IOException {
 		StringBuilder sb = new StringBuilder();
 		
-		File dir = new File(diretorio);
-		File arq = new File(dir, arquivo);
-
-		BufferedReader buffRead = new BufferedReader(new FileReader(arq));
+		BufferedReader buffRead = new BufferedReader(new FileReader(path));
 		String linha = "";
 		while (true) {
 			if (linha != null) {
@@ -59,7 +59,63 @@ public class ManipuladorArquivo {
 		}
 		buffWrite.close();
 	}
-
+	
+	/**
+	 * 
+	 * @param path
+	 * @param chaves
+	 * @throws IOException
+	 */
+	public void escritorJson(String path, Map<String, SortedSet<String>> agruparChaves) throws IOException {
+		int cont1 = 0;
+		int cont2 = 0;
+		
+		BufferedWriter buffWrite = new BufferedWriter(new FileWriter(path));
+		buffWrite.append("{ ");
+		for (Map.Entry<String, SortedSet<String>> chaves : agruparChaves.entrySet()) {
+			cont2 = 0;
+			if (cont1 == 0) {
+				buffWrite.append(" \"" + chaves.getKey() + "\": {");
+			} else {
+				buffWrite.append(" ,\"" + chaves.getKey() + "\": {");
+			}
+			
+			SortedSet<String> chavesAgrupadas = chaves.getValue();
+			for (String chave : chavesAgrupadas) {
+				if (cont2 == 0) {
+					buffWrite.append(" \"" + chave.toString() + "\": ");
+				} else {
+					buffWrite.append(" ,\"" + chave.toString() + "\": ");
+				}
+				cont2++;
+			}
+			cont1++;
+			buffWrite.append("}");
+		}
+		buffWrite.append("}");
+		buffWrite.close();
+	}
+	
+	/**
+	 * 
+	 * @param path
+	 * @param chaves
+	 * @throws IOException
+	 */
+	public void escritorJson2(String path, Map<String, SortedSet<String>> agruparChaves) throws IOException {
+		JsonWriter jsonWrite = new JsonWriter(new FileWriter(path));
+		jsonWrite.beginObject();
+		for (Map.Entry<String, SortedSet<String>> chaves : agruparChaves.entrySet()) {
+//			jsonWrite.name(chaves.getKey());
+//			jsonWrite.
+			SortedSet<String> chavesAgrupadas = chaves.getValue();
+			for (String chave : chavesAgrupadas) {
+//				jsonWrite.value(chave);
+			}
+		}
+		jsonWrite.close();
+	}
+	
 	/**
 	 * 
 	 * 
