@@ -7,16 +7,19 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class ManipuladorArquivo {
-
+	
 	private static ManipuladorArquivo instance = new ManipuladorArquivo();
 
 	public static ManipuladorArquivo getInstance() {
@@ -47,53 +50,35 @@ public class ManipuladorArquivo {
 		buffWrite.close();
 	}
 	
-	public void escritorJson(String path, Map<String, SortedSet<String>> agruparChaves) throws IOException {
-		int cont1 = 0;
-		int cont2 = 0;
+	public void escritorJson(String path, SortedSet<String> chaves) throws IOException {
+		JsonParser parser = new JsonParser();
 		
-		BufferedWriter buffWrite = new BufferedWriter(new FileWriter(path));
-		buffWrite.append("{ ");
-		for (Map.Entry<String, SortedSet<String>> chaves : agruparChaves.entrySet()) {
-			cont2 = 0;
-			if (cont1 == 0) {
-				buffWrite.append(" \"" + chaves.getKey() + "\": {");
-			} else {
-				buffWrite.append(" ,\"" + chaves.getKey() + "\": {");
+		//Map que irá receber os objetos agrupados
+		Map<String, List<Object>> agruparChaves = new HashMap<String, List<Object>>();
+		
+		for (String chave : chaves) {
+			String chaveDividida[] = chave.toString().split("\\.");
+			
+			//Criar o map para depois adicionar
+			if (!agruparChaves.containsKey(chaveDividida[0])) {
+				agruparChaves.put(chaveDividida[0], new ArrayList<Object>());
 			}
 			
-			SortedSet<String> chavesAgrupadas = chaves.getValue();
-			for (String chave : chavesAgrupadas) {
-				if (cont2 == 0) {
-//					buffWrite.append(" \"" + chave.toString() + "\": ");
-					buffWrite.append(" \"" + chave.toString() + "\" ");
-				} else {
-//					buffWrite.append(" ,\"" + chave.toString() + "\": ");
-					buffWrite.append(" ,\"" + chave.toString() + "\" ");
-				}
-				cont2++;
-			}
-			cont1++;
-			buffWrite.append("}");
+			JsonObject jsonObject = new JsonObject();
+			String valor = "\"" + chaveDividida[2] + "\"";
+			JsonElement jsonElement = parser.parse(valor);
+			jsonObject.add(chaveDividida[1], jsonElement);
+			
+			//Adicionar ao map criado
+			agruparChaves.get(chaveDividida[0]).add(jsonObject);
 		}
-		buffWrite.append("}");
-		buffWrite.close();
-	}
-	
-	public void escritorJson2(String path, Map<String, JsonObject> agruparChaves) throws IOException {
-//		JsonWriter jsonWrite = new JsonWriter(new FileWriter(path));
-//		jsonWrite.beginObject();
+		
 		Gson gson = new GsonBuilder().create();
-//		gson.toJson(agruparChaves);
-		System.out.println(gson.toJson(agruparChaves));
-//		for (Map.Entry<String, SortedSet<String>> chaves : agruparChaves.entrySet()) {
-////			jsonWrite.name(chaves.getKey());
-////			jsonWrite.
-//			SortedSet<String> chavesAgrupadas = chaves.getValue();
-//			for (String chave : chavesAgrupadas) {
-////				jsonWrite.value(chave);
-//			}
-//		}
-//		jsonWrite.close();
+		String json = gson.toJson(agruparChaves);
+
+		BufferedWriter buffWrite = new BufferedWriter(new FileWriter(path));
+		buffWrite.write(json);
+		buffWrite.close();
 	}
 	
 	public List<String> buscaArquivosHtmlDiretorios(String pasta, String extensao, String... diretorios) {
