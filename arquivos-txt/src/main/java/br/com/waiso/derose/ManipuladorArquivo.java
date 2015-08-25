@@ -81,6 +81,19 @@ public class ManipuladorArquivo {
 		buffWrite.close();
 	}
 	
+	public void escritorTmx(String path, SortedSet<String> chaves) throws IOException {
+		BufferedWriter buffWrite = new BufferedWriter(new FileWriter(path));
+		
+		buffWrite.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE tmx SYSTEM \"tmx14.dtd\"><tmx version=\"1.4\"><body>");
+		for (String chave : chaves) {
+			String chaveDividida[] = chave.toString().split(">");
+			buffWrite.append("<tu tuid=\"" + chaveDividida[0] + "\">");
+			buffWrite.append("<tuv xml:lang=\"pt_BR\"><seg>" + chaveDividida[1] + "</seg></tuv></tu>");
+		}
+		buffWrite.append("</body></tmx>");
+		buffWrite.close();
+	}
+	
 	public List<String> buscaArquivosHtmlDiretorios(String pasta, String extensao, String... diretorios) {
 		List<String> arquivos = new ArrayList<String>();
 		

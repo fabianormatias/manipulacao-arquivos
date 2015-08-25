@@ -22,15 +22,15 @@ public class HtmlTest {
 	
 	private String DESTINO_CHAVES = "//Users/fabianorodriguesmatias/Developer/testes/testes/derose.txt";
 	private String DESTINO_JSON = "//Users/fabianorodriguesmatias/Developer/testes/testes/derose-i18n.json";
+	private String DESTINO_TMX = "//Users/fabianorodriguesmatias/Developer/testes/testes/derose-i18n-pt_BR.tmx";
+	private String DESTINO_TABELA = "//Users/fabianorodriguesmatias/Developer/testes/testes/derose-i18n.txt";
 	
 	// Explicando a expressão regular:  
     // data-i18n - serve para bater com o "data-i18n"  
     // ()  - serve para agrupar o que desejo achar para poder usar group(1)  
     // .   - bate com qualquer caracter  
-    // *?  - Serve para repetir a expressão anterior (no caso ".") 0 a infinitas vezes,   
-    //       mas usando o o método "não-ganancioso" (ou seja, bate com a expressão mais curta, não a mais longa possível).
+    // *?  - Serve para repetir a expressão anterior (no caso ".") 0 a infinitas vezes   
 	private String PADRAO = "data-i18n(.*?)<";
-	
 	private String PADRAO_CHAVES = "\"(.*?)<";
 	
 	@Test
@@ -59,7 +59,7 @@ public class HtmlTest {
 	}
 	
 	@Test
-	public void testAjustaChaves() {
+	public void testGeraJson() {
 		try {
 			pattern = Pattern.compile(PADRAO_CHAVES, Pattern.CASE_INSENSITIVE);
 			chaves = new TreeSet<String>();
@@ -75,6 +75,49 @@ public class HtmlTest {
 			}
 			
 			ManipuladorArquivo.getInstance().escritorJson(DESTINO_JSON, chaves);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void testGeraTmx() {
+		try {
+			pattern = Pattern.compile(PADRAO_CHAVES, Pattern.CASE_INSENSITIVE);
+			chaves = new TreeSet<String>();
+			
+			arquivo = ManipuladorArquivo.getInstance().leitor(DESTINO_CHAVES);
+			matcher = pattern.matcher(arquivo);
+			while (matcher.find()) {
+				String match = matcher.group();
+				match = match.replace("\"", "");
+				match = match.replace("<", "");
+				chaves.add(match);
+			}
+			
+			ManipuladorArquivo.getInstance().escritorTmx(DESTINO_TMX, chaves);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void testGeraTabela() {
+		try {
+			pattern = Pattern.compile(PADRAO_CHAVES, Pattern.CASE_INSENSITIVE);
+			chaves = new TreeSet<String>();
+			
+			arquivo = ManipuladorArquivo.getInstance().leitor(DESTINO_CHAVES);
+			matcher = pattern.matcher(arquivo);
+			while (matcher.find()) {
+				String match = matcher.group();
+				match = match.replace("\"", "");
+				match = match.replace(">", "=");
+				match = match.replace("<", "");
+				chaves.add(match);
+			}
+			
+			ManipuladorArquivo.getInstance().escritor(DESTINO_TABELA, chaves);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
