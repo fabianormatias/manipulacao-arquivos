@@ -33,12 +33,17 @@ public class HtmlTest {
 	private String PADRAO = "data-i18n(.*?)<";
 	private String PADRAO_CHAVES = "\"(.*?)<";
 	
+	//TODO
+	// Validar se a chave realmente tem 2 posições
+	
 	@Test
 	public void testCapturaChaves() {
 		try {
 			pattern = Pattern.compile(PADRAO, Pattern.CASE_INSENSITIVE);
 			
-			diretorio = "//Users/fabianorodriguesmatias/Developer/testes/alterada";
+//			diretorio = "//Users/fabianorodriguesmatias/Developer/testes/alterada";
+			diretorio = "//Users/fabianorodriguesmatias/Developer/workspace/clientes/derose/refactor_html/alterada";
+			
 
 			// Busca dos arquivos existentes no diretório
 			arquivos = ManipuladorArquivo.getInstance().buscaArquivosHtmlDiretorio(diretorio, ".html", "phone");

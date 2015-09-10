@@ -7,6 +7,7 @@
 	<packaging>pom</packaging>
 	<modules>
 		<module>arquivos-txt</module>
+		<module>poc-internacionalizacao</module>
 	</modules>
 	<dependencies>
 		<dependency>

@@ -59,18 +59,24 @@ public class ManipuladorArquivo {
 		for (String chave : chaves) {
 			String chaveDividida[] = chave.toString().split("\\.");
 			
+			//TODO VALIDAR ESSA MERDA!!!
+			if (chaveDividida.length == 5) {
+				System.out.println("Ajustar...");
+			}
+			
 			//Criar o map para depois adicionar
-			if (!agruparChaves.containsKey(chaveDividida[0])) {
-				agruparChaves.put(chaveDividida[0], new ArrayList<Object>());
+			if (!agruparChaves.containsKey(chaveDividida[1])) {
+				agruparChaves.put(chaveDividida[1], new ArrayList<Object>());
 			}
 			
 			JsonObject jsonObject = new JsonObject();
-			String valor = "\"" + chaveDividida[2] + "\"";
+			String valor = "\"" + chaveDividida[3] + "\"";
 			JsonElement jsonElement = parser.parse(valor);
-			jsonObject.add(chaveDividida[1], jsonElement);
+			
+			jsonObject.add(chaveDividida[2], jsonElement);
 			
 			//Adicionar ao map criado
-			agruparChaves.get(chaveDividida[0]).add(jsonObject);
+			agruparChaves.get(chaveDividida[1]).add(jsonObject);
 		}
 		
 		Gson gson = new GsonBuilder().create();
