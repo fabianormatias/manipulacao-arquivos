@@ -18,7 +18,7 @@ public class GeradorArquivo {
 	private String PADRAO = "data-i18n(.*?)<";
 
 	private String ARQUIVO_JSON = "/derose-i18n.json";
-	private String ARQUIVO_TMX = "derose-i18n-pt_BR.tmx";
+	private String ARQUIVO_TMX = "/derose-i18n-pt_BR.tmx";
 
 	private static GeradorArquivo instance = new GeradorArquivo();
 
