@@ -8,6 +8,8 @@
 	<modules>
 		<module>arquivos-txt</module>
 		<module>poc-internacionalizacao</module>
+		<module>arquivos-properties</module>
+		<module>fileinputstram-fileoutputstream</module>
 	</modules>
 	<dependencies>
 		<dependency>
