@@ -1,30 +1,56 @@
 package br.com.g6.leitura.escrita.exemplo1;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Properties;
+
+//TODO Falta fazer escrever no arquivo
 
 public class CapturarEnderecoResources {
 
 	public static void main(String[] args) {
 		try {
 			Properties prop = new Properties();
+			
+//			File jarPath = new File(CapturarEnderecoResources.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+//			String propertiesPath = jarPath.getParentFile().getAbsolutePath();
+//			System.out.println(" propertiesPath-" + propertiesPath);
+			
 			File jarPath = new File(CapturarEnderecoResources.class.getProtectionDomain().getCodeSource().getLocation().getPath());
 			String propertiesPath = jarPath.getParentFile().getAbsolutePath();
 			System.out.println(" propertiesPath-" + propertiesPath);
 			
-			//TODO Abrir arquivo
+			URL url = CapturarEnderecoResources.class.getClassLoader().getResource("exemplo1.properties");
+			System.out.println("Endereco: " + url);
+
+			InputStream is = url.openStream();
+			prop.load(is);
 			
-			prop.load(new FileInputStream(propertiesPath + "/exemplo1.properties"));
+			String login1;
+			String host1;
+			String password1;
+			login1 = prop.getProperty("prop.server.login");
+			host1 = prop.getProperty("prop.server.host");
+			password1 = prop.getProperty("prop.server.password");
+			System.out.println("Login = " + login1);
+			System.out.println("Host = " + host1);
+			System.out.println("Password = " + password1);
 			
-			// Variavel que guardará o login do servidor.
+			// --------------
+			
+			prop.setProperty("prop.server.login", "fabiano");
+			
+//			OutputStream os = url.;
+			
+			FileOutputStream saida = new FileOutputStream(url.toString());
+			prop.store(saida, "Alteração properties");
+			
 			String login;
-			// Variavel que guardará o host do servidor.
 			String host;
-			// Variável que guardará o password do usúario.
 			String password;
 			Properties props = getProp();
 			login = props.getProperty("prop.server.login");
@@ -42,7 +68,7 @@ public class CapturarEnderecoResources {
 	
 	public static Properties getProp() throws IOException {
 		Properties props = new Properties();
-		InputStream file = Manipulador.class.getResourceAsStream("/exemplo1.properties");
+		InputStream file = CapturarEnderecoResources.class.getResourceAsStream("/exemplo1.properties");
 		props.load(file);
 		return props;
 	}

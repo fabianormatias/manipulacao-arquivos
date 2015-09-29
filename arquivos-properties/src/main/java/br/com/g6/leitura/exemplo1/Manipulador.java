@@ -9,6 +9,7 @@ public class Manipulador {
 	public static Properties getProp() throws IOException {
 		Properties props = new Properties();
 		InputStream file = Manipulador.class.getResourceAsStream("/exemplo1.properties");
+		System.out.println("Endereco: " + file);
 		props.load(file);
 		return props;
 	}

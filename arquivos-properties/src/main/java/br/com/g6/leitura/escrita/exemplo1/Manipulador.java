@@ -33,6 +33,6 @@ public class Manipulador {
 		prop.setProperty("prop.server.login", "login");
 		prop.setProperty("prop.server.host", "host");
 		prop.setProperty("prop.server.password", "password");
-		prop.store(new FileOutputStream("./properties/dados.properties"), null); 
+		prop.store(new FileOutputStream("/exemplo1.properties"), null); 
 	}
 }
