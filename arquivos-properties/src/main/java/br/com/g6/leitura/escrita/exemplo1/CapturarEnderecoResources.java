@@ -1,5 +1,6 @@
 package br.com.g6.leitura.escrita.exemplo1;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -23,7 +24,8 @@ public class CapturarEnderecoResources {
 			prop.setProperty("prop.server.login", "fabiano");
 			
 			//TODO Ele não acha o arquivo
-			FileOutputStream saida = new FileOutputStream("exemplo1.properties");
+			File f = new File("exemplo1.properties");
+			FileOutputStream saida = new FileOutputStream(f);
 			prop.store(saida, "Alteração properties");
 			
 			String login;

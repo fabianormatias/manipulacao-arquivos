@@ -10,12 +10,9 @@ import java.util.Properties;
 public class App {
 	
 	public static void main(String[] args) {
-
 		Properties prop = new Properties();
 		OutputStream output = null;
-
 		try {
-
 			output = new FileOutputStream("config.properties");
 
 			// set the properties value
@@ -25,7 +22,9 @@ public class App {
 
 			// save properties to project root folder
 			prop.store(output, null);
-
+			
+//			String database = prop.getProperty("database");
+//			System.out.println("Database: " + database);
 		} catch (IOException io) {
 			io.printStackTrace();
 		} finally {
@@ -36,7 +35,6 @@ public class App {
 					e.printStackTrace();
 				}
 			}
-
 		}
 	}
 	
