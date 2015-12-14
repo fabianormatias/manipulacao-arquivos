@@ -8,4 +8,11 @@
 	</parent>
 	<groupId>br.com.waiso.manipulacao.arquivos.txt</groupId>
 	<artifactId>arquivos-txt</artifactId>
+	<dependencies>
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+			<version>1.7.3</version>
+		</dependency>
+	</dependencies>
 </project>
